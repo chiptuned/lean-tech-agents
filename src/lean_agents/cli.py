@@ -95,23 +95,37 @@ def iterations(
 
 
 @app.command()
-def serve() -> None:
-    """Start the Lean Tech MCP server (stdio transport)."""
-    import asyncio
-    import sys
+def serve(
+    stdio: bool = typer.Option(
+        False, "--stdio", help="Use stdio transport (for Claude Desktop JSON config)"
+    ),
+    host: str = typer.Option(
+        "0.0.0.0", "--host", "-H", help="Host to bind to"
+    ),
+    port: int = typer.Option(
+        8000, "--port", "-P", help="Port to bind to"
+    ),
+) -> None:
+    """Start the Lean Tech MCP server.
 
-    from lean_agents.mcp_server import run_server
+    Default: HTTP server on port 8000 — add the URL in Claude Desktop as a custom connector.
+    With --stdio: stdio transport for Claude Desktop JSON config.
+    """
+    if stdio:
+        from lean_agents.mcp_server import run_stdio
 
-    # MCP uses stdin/stdout for JSON-RPC — print to stderr only
-    print("Starting Lean Tech MCP server...", file=sys.stderr)
-    asyncio.run(run_server())
+        run_stdio()
+    else:
+        from lean_agents.mcp_server import run_http
+
+        console.print(
+            f"[bold green]Lean Tech MCP server starting on http://{host}:{port}/mcp[/bold green]\n"
+            "Add this URL as a [bold]custom connector[/bold] in Claude Desktop.\n\n"
+            "[dim]For stdio mode (Claude Desktop JSON config), use: lean-agents serve --stdio[/dim]"
+        )
+        run_http(host=host, port=port)
 
 
 @app.command()
 def version() -> None:
-    """Show version."""
-    console.print(f"lean-tech-agents v{__version__}")
-
-
-if __name__ == "__main__":
-    app()
+    ""

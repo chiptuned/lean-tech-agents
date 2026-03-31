@@ -14,7 +14,8 @@ dependencies = [
     "pydantic>=2.10.0",
     "pydantic-settings>=2.7.0",
     "loguru>=0.7.3",
-    "mcp>=1.0.0",
+    "mcp[cli]>=1.26.0",
+    "uvicorn>=0.34.0",
 ]
 
 [project.optional-dependencies]
@@ -27,6 +28,7 @@ dev = [
 
 [project.scripts]
 lean-agents = "lean_agents.cli:app"
+lean-tech-agents = "lean_agents.cli:app"
 
 [build-system]
 requires = ["hatchling"]
