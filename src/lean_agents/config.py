@@ -11,6 +11,17 @@ from pydantic import Field
 from pydantic_settings import BaseSettings, SettingsConfigDict
 
 
+def _data_dir() -> Path:
+    """Return a writable base directory for lean-agents data.
+
+    Uses ~/.lean-agents/ so it works regardless of cwd (especially
+    when run inside uv's read-only cache via uvx).
+    """
+    d = Path.home() / ".lean-agents"
+    d.mkdir(parents=True, exist_ok=True)
+    return d
+
+
 class Settings(BaseSettings):
     """Global configuration — overridable via env vars or .env file."""
 
@@ -35,10 +46,10 @@ class Settings(BaseSettings):
     max_budget_usd: float = Field(default=5.0, description="Total budget cap per run")
     wip_limit: int = Field(default=1, description="One-piece flow — max concurrent tasks")
 
-    # --- Paths ---
+    # --- Paths (default to ~/.lean-agents/ so uvx works) ---
     project_dir: Path = Field(default=Path("."), description="Root of the target project")
-    iterations_dir: Path = Field(default=Path("iterations"), description="Iteration log output")
-    obeya_dir: Path = Field(default=Path("obeya"), description="Visual management output")
+    iterations_dir: Path = Field(default_factory=lambda: _data_dir() / "iterations", description="Iteration log output")
+    obeya_dir: Path = Field(default_factory=lambda: _data_dir() / "obeya", description="Visual management output")
 
     # --- Quality thresholds ---
     min_sqdce_score: float = Field(default=0.7, description="Minimum SQDCE score to pass review")
