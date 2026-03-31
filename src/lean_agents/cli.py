@@ -98,10 +98,12 @@ def iterations(
 def serve() -> None:
     """Start the Lean Tech MCP server (stdio transport)."""
     import asyncio
+    import sys
 
     from lean_agents.mcp_server import run_server
 
-    console.print("[bold cyan]Starting Lean Tech MCP server...[/bold cyan]")
+    # MCP uses stdin/stdout for JSON-RPC — print to stderr only
+    print("Starting Lean Tech MCP server...", file=sys.stderr)
     asyncio.run(run_server())
 
 
